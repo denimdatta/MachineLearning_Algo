@@ -1,8 +1,4 @@
 # Name: Denim Datta
-# ID: 1213152289
-# CSE 575 (SML)
-# Assignment 1
-# Question 5.2 Helper : to train and predict Logistic Regression Model
 
 import decimal
 import random
@@ -21,7 +17,12 @@ def create_dataset(filename, ratio):
 
     for line in data:
         values = line.rstrip().split(",")
-        dataset.append([float(values[0]), float(values[1]), float(values[2]), float(values[3]), int(values[4])])
+        # dataset.append([float(values[0]), float(values[1]), float(values[2]), float(values[3]), int(values[4])])
+        tmp = []
+        for v in values[0:-1]:
+            tmp.append(float(v))
+        tmp.append(int(values[-1]))
+        dataset.append(tmp)
 
     # ratio portion of the dataset is used as Training Data
     # rest is Test Data
@@ -42,29 +43,36 @@ def fraction_training(trndata, fraction):
 
 
 def find_sigmoid(data, weight):
-    sum = weight[0] + (weight[1] * data[0]) + (weight[2] * data[1]) + (weight[3] * data[2]) + (weight[4] * data[3])
-    # exp = np.exp(-sum)
+    # wSum = weight[0] + (weight[1] * data[0]) + (weight[2] * data[1]) + (weight[3] * data[2]) + (weight[4] * data[3])
+    # exp = np.exp(-wSum)
     # sigmoid = (1.0 / (1 + exp))
-    sigmoid = expit(sum)
+
+    wSum = weight[0]
+    for i in range(len(data) - 1):
+        wSum += (weight[i+1] * data[i])
+    sigmoid = expit(wSum)
     return sigmoid
 
 
 def weight_vector_update(trndata, learning_rate, repeatation):
     # intialize weight vector (0, 0, 0, 0, 0)
-    weight = [0, 0, 0, 0, 0]
-
+    weight = [0] * len(trndata[0])
+    
     # dweight will keep the d[l(w)]/d[wi]
-    dweight = [0, 0, 0, 0, 0]
+    dweight = [0] * len(trndata[0])
+
     for repeat in range(repeatation):
         for data in trndata:
             sigmoid = find_sigmoid(data, weight)
-            y_minus_p = data[4] - sigmoid
+            y_minus_p = data[-1] - sigmoid
             # w_update = find_sigmoid(data, weight)
             dweight[0] = dweight[0] + y_minus_p
-            dweight[1] = dweight[1] + (y_minus_p * data[0])
-            dweight[2] = dweight[2] + (y_minus_p * data[1])
-            dweight[3] = dweight[3] + (y_minus_p * data[2])
-            dweight[4] = dweight[4] + (y_minus_p * data[3])
+            for i in range(len(data) - 1):
+                dweight[i+1] = dweight[i+1] + (y_minus_p * data[i])
+            # dweight[1] = dweight[1] + (y_minus_p * data[0])
+            # dweight[2] = dweight[2] + (y_minus_p * data[1])
+            # dweight[3] = dweight[3] + (y_minus_p * data[2])
+            # dweight[4] = dweight[4] + (y_minus_p * data[3])
 
         for i in range(len(weight)):
             weight[i] = weight[i] + (learning_rate * dweight[i])
@@ -75,8 +83,8 @@ def weight_vector_update(trndata, learning_rate, repeatation):
 def prediction(tstdata, weight_v):
     predict = []
     for index in range(len(tstdata)):
-        predict_sigmoid = find_sigmoid(tstdata[index], weight_v)
-        predict.append(round(predict_sigmoid))
+        predict_sigmoid = find_sigmoid(tstdata[index], weight_v).flatten('F')
+        predict.append(round(predict_sigmoid[0]))
 
     return predict
 
@@ -84,7 +92,7 @@ def prediction(tstdata, weight_v):
 def accuracy(tstdata, predicts):
     right = 0
     for i in range(len(tstdata)):
-        if predicts[i] == tstdata[i][4]:
+        if predicts[i] == tstdata[i][-1]:
             right += 1
 
     return (right / len(tstdata)) * 100.0

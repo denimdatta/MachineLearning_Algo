@@ -1,8 +1,4 @@
 # Name: Denim Datta
-# ID: 1213152289
-# CSE 575 (SML)
-# Assignment 2
-# Question 3
 
 import math
 import time

@@ -16,7 +16,12 @@ def create_dataset(filename, ratio):
 
     for line in data:
         values = line.rstrip().split(",")
-        dataset.append([float(values[0]), float(values[1]), float(values[2]), float(values[3]), int(values[4])])
+        # dataset.append([float(values[0]), float(values[1]), float(values[2]), float(values[3]), int(values[4])])
+        tmp = []
+        for v in values[0:-1]:
+            tmp.append(float(v))
+        tmp.append(int(values[-1]))
+        dataset.append(tmp)
 
     # ratio portion of the dataset is used as Training Data
     # rest is Test Data
@@ -54,8 +59,8 @@ def split_target(dataset):
     for index in range(len(dataset)):
         data = dataset[index]
         if data[4] not in splitdata:
-            splitdata[data[4]] = []
-        splitdata[data[4]].append(data[:4])
+            splitdata[data[-1]] = []
+        splitdata[data[-1]].append(data[:-1])
 
     return splitdata
 
@@ -119,7 +124,7 @@ def prediction(estimate, tstdata):
 def accuracy(tstdata, predicts):
     right = 0
     for i in range(len(tstdata)):
-        if predicts[i] == tstdata[i][4]:
+        if predicts[i] == tstdata[i][-1]:
             right += 1
 
     return (right / len(tstdata)) * 100.0
