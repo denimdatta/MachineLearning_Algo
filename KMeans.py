@@ -1,7 +1,8 @@
 # Name: Denim Datta
 
-import time
 import math
+import time
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -33,11 +34,7 @@ def kmean_cluster(data, k):
         for feature in data:
             n_feature = np.array(feature)
             n_centroid = [np.array(centroid) for centroid in centroids]
-            # euclidian = []
-            # for centroid in n_centroid:
-            #     euclidian.append(np.linalg.norm(centroid - n_feature))
             euclidian = [np.linalg.norm(centroid - n_feature) for centroid in n_centroid]
-
             min_index = euclidian.index(min(euclidian))
             region[min_index].append(feature)
 
@@ -62,6 +59,7 @@ def check_empty_region(region):
     empty_region_count = 0
     empty_regions = []
     largest_region_index = 0
+
     for r in region.keys():
         if len(region[r]) > len(region[largest_region_index]):
             largest_region_index = r
@@ -90,12 +88,10 @@ def find_centroids(regions):
 
 def potential_fn(centroid, region):
     potential = 0
-
     for i in range(len(centroid)):
         dist = [np.linalg.norm(np.array(centroid[i]) - data) for data in region[i]]
         for d in dist:
-            potential += d
-
+            potential += (d * d)
     return potential
 
 
@@ -110,7 +106,8 @@ def main():
         potentials.append(potential)
         print("K value: {0}      Potential function value: {1}".format(k, potential))
 
-    plt.ylim(int(math.floor((min(potentials) - 1) / 100.0)) * 100, int(math.ceil((max(potentials) + 1) / 100.0)) * 100)
+    plt.ylim(int(math.floor((min(potentials) - 1) / 1000.0)) * 1000,
+             int(math.ceil((max(potentials) + 1) / 1000.0)) * 1000)
     plt.ylabel("Potential function value")
     plt.xlabel("K Value")
     plt.title("Potential function value  Vs.  K value")
